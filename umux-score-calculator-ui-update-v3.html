@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMUX Score Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .calculator, .result-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .calculator {
+            width: 300px;
+        }
+        .result-card {
+            width: 500px; /* Increased width for the result card */
+        }
+        .calculator h2, .result-card h2 {
+            text-align: left;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #80bdff;
+        }
+        .caption {
+            font-size: 12px;
+            color: #555;
+            margin-top: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .result {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 18px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 6px solid #ffd700;
+        }
+        .star-icon {
+            font-size: 20px;
+            color: #FFD700;
+            margin-right: 5px;
+        }
+        .interpretation {
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .interpretation p {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-left: 6px solid transparent;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            color: #666;
+            background-color: #f8f9fa;
+        }
+        .interpretation p.highlight {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .interpretation p.grayed-out {
+            opacity: 0.5;
+        }
+        .interpretation .arrow-icon {
+            font-size: 16px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="calculator">
+            <h2>Calculator</h2>
+            <div class="input-group">
+                <label for="q1">* Question 1 score</label>
+                <input type="number" id="q1" min="1" max="7" placeholder="Input a number between 1-7" required>
+                <div class="caption">"... is easy to use"</div>
+            </div>
+            <div class="input-group">
+                <label for="q2">* Question 2 score</label>
+                <input type="number" id="q2" min="1" max="7" placeholder="Input a number between 1-7" required>
+                <div class="caption">"... meets my requirements"</div>
+            </div>
+            <button onclick="calculateUMUX()">Calculate Score</button>
+        </div>
+        <div class="result-card">
+            <h2>Results</h2>
+            <div class="result" id="result">
+                <span class="star-icon">⭐</span>
+                <span><b>Your score:</b> --</span>
+            </div>
+            <div class="interpretation" id="interpretation">
+                <p id="poor" class="grayed-out"><span class="arrow-icon">➡️</span><span class="title">Poor usability (0-49):</span> Users likely find the product difficult to use or feel it doesn’t meet their needs.</p>
+                <p id="moderate" class="grayed-out"><span class="arrow-icon">➡️</span><span class="title">Moderate usability (50-69):</span> The product may be somewhat functional, but improvements are needed to enhance user satisfaction.</p>
+                <p id="good" class="grayed-out"><span class="arrow-icon">➡️</span><span class="title">Good usability (70-84):</span> The product meets most user expectations, and users find it generally easy to use. Minor adjustments can improve the experience further.</p>
+                <p id="excellent" class="grayed-out"><span class="arrow-icon">➡️</span><span class="title">Excellent usability (85-100):</span> Users find the product highly intuitive and well-suited to their needs. Focus on maintaining this level of usability.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateUMUX() {
+            const q1 = parseInt(document.getElementById('q1').value);
+            const q2 = parseInt(document.getElementById('q2').value);
+
+            if (q1 >= 1 && q1 <= 7 && q2 >= 1 && q2 <= 7) {
+                const score = ((q1 + q2) - 2) / 12 * 100;
+                document.querySelector('.result span:nth-child(2)').innerHTML = `<b>Your score:</b> ${score.toFixed(1)}`;
+
+                document.querySelectorAll('.interpretation p').forEach((p) => {
+                    p.classList.remove('highlight');
+                    p.classList.add('grayed-out');
+                });
+
+                if (score < 50) {
+                    const elem = document.getElementById('poor');
+                    elem.classList.remove('grayed-out');
+                    elem.classList.add('highlight');
+                } else if (score >= 50 && score < 70) {
+                    const elem = document.getElementById('moderate');
+                    elem.classList.remove('grayed-out');
+                    elem.classList.add('highlight');
+                } else if (score >= 70 && score < 85) {
+                    const elem = document.getElementById('good');
+                    elem.classList.remove('grayed-out');
+                    elem.classList.add('highlight');
+                } else {
+                    const elem = document.getElementById('excellent');
+                    elem.classList.remove('grayed-out');
+                    elem.classList.add('highlight');
+                }
+            } else {
+                alert('Please enter valid scores between 1 and 7 for both questions.');
+            }
+        }
+    </script>
+</body>
+</html>
